@@ -1,5 +1,7 @@
 package kata.acad.Config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -8,8 +10,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
@@ -28,35 +32,57 @@ public class JpaConfig {
 
     @Bean
     public DataSource getDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("db.driver"));
-        dataSource.setUrl(env.getProperty("db.url"));
-        dataSource.setUsername(env.getProperty("db.username"));
-        dataSource.setPassword(env.getProperty("db.password"));
+        String driver = env.getProperty("db.driver");
+        String url = env.getProperty("db.url");
+        String username = env.getProperty("db.username");
+        String pswrd = env.getProperty("db.password");
 
-        return dataSource;
+        if (driver == null || url == null || username == null || pswrd == null) {
+            throw new IllegalStateException("Проверьте данные для подключения к БД");
+        }
+
+        HikariConfig config = new HikariConfig();
+        config.setDriverClassName(driver);
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(pswrd);
+        config.setMaximumPoolSize(10);
+
+        return new HikariDataSource(config);
+
+//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+//        dataSource.setDriverClassName(env.getProperty("db.driver"));
+////        dataSource.setUrl(env.getProperty("db.url"));
+//        dataSource.setUsername(env.getProperty("db.username"));
+//        dataSource.setPassword(env.getProperty("db.password"));
+//        dataSource.setUrl(env.getProperty("db.url") +
+//                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+//
+//        return dataSource;
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean() {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(getDataSource());
         emf.setPackagesToScan("kata.acad");
         emf.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
 
         Properties properties = new Properties();
-        properties.put("javax.persistence.jdbc.driver", env.getProperty("db.driver"));
-        properties.put("javax.persistence.jdbc.url", env.getProperty("db.url"));
-        properties.put("javax.persistence.jdbc.user", env.getProperty("db.username"));
-        properties.put("javax.persistence.jdbc.password", env.getProperty("db.password"));
-
         properties.put("hibernate.dialect", env.getProperty("db.dialect"));
         properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+//        properties.put("hibernate.connection.provider_class",
+//                env.getProperty("hibernate.connection.provider_class"));
         emf.setJpaProperties(properties);
 
         return emf;
     }
 
-
+    @Bean
+    public TransactionManager getTransactionManager() {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
+        return transactionManager;
+    }
 }

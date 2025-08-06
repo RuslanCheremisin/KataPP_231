@@ -8,11 +8,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column
+    @Column(nullable = false)
     private String firstName;
     @Column
     private String lastName;
-    @Column
+    @Column(nullable = false)
     private int age;
 
     public User() {
@@ -46,5 +46,19 @@ public class User {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", age=" + age +
+                '}';
     }
 }

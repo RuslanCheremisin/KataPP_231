@@ -2,15 +2,14 @@ package kata.acad.DAO.Impl;
 
 import kata.acad.DAO.UserDAO;
 import kata.acad.Model.User;
+
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
-@Transactional
 public class UserDAONoSpringBootImpl implements UserDAO {
 
     @PersistenceContext
@@ -22,7 +21,11 @@ public class UserDAONoSpringBootImpl implements UserDAO {
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(Long id, User newUser) {
+        User user = getUserByID(id);
+        user.setFirstName(newUser.getFirstName());
+        user.setLastName(newUser.getLastName());
+        user.setAge(newUser.getAge());
         entityManager.merge(user);
     }
 
@@ -32,17 +35,17 @@ public class UserDAONoSpringBootImpl implements UserDAO {
     }
 
     @Override
-    public User getUserByID(int id) {
+    public User getUserByID(Long id) {
         return entityManager.find(User.class, id);
     }
 
     @Override
-    public void deleteUser(User user) {
-        entityManager.remove(user);
+    public void deleteUser(Long id) {
+        entityManager.createQuery("DELETE FROM User u WHERE u.id = :id").setParameter("id", id).executeUpdate();
     }
 
     @Override
     public void deleteAllUsers() {
-        entityManager.createNativeQuery("TRUNCATE TABLE users");
+        entityManager.createNativeQuery("TRUNCATE TABLE users").executeUpdate();
     }
 }
