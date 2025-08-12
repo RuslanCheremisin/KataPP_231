@@ -1,5 +1,11 @@
 package kata.acad.Model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Pattern;
+
+
 import javax.persistence.*;
 
 @Entity
@@ -9,10 +15,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    @NotNull(message = "Имя не может быть пустым!")
+    @Pattern(regexp = "^[\\p{L}'-]+(?:\\s[\\p{L}'-]+)*$", message = "Можно использовать только буквы и дефисы(для составных имён)!")
     private String firstName;
     @Column
+    @Pattern(regexp = "^[\\p{L}'-]+(?:\\s[\\p{L}'-]+)*$", message = "Можно использовать только буквы и дефисы(для составных фамилий)!")
     private String lastName;
     @Column(nullable = false)
+    @Positive(message = "Возраст должен быть больше нуля!")
+    @Max(value = 120, message = "Возраст должен быть больше возраст должен быть меньше 120!")
     private int age;
 
     public User() {
@@ -60,5 +71,9 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
                 '}';
+    }
+
+    public void setId(@Positive Long id) {
+        this.id = id;
     }
 }

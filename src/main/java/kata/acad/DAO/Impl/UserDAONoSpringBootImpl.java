@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public class UserDAONoSpringBootImpl implements UserDAO {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "entityManagerFactory")
     private EntityManager entityManager;
 
     @Override
@@ -27,6 +27,7 @@ public class UserDAONoSpringBootImpl implements UserDAO {
         user.setLastName(newUser.getLastName());
         user.setAge(newUser.getAge());
         entityManager.merge(user);
+        entityManager.flush();
     }
 
     @Override

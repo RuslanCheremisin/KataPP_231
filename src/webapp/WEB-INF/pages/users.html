@@ -1,39 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Users List</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>User list</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Дополнительные стили при необходимости */
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-4">
-    <h1>Users List</h1>
-    <a th:href="@{/users/add}" class="btn btn-primary mb-3">Add User</a>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Age</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${users}">
-            <td th:text="${user.id}"></td>
-            <td th:text="${user.firstName}"></td>
-            <td th:text="${user.lastName}"></td>
-            <td th:text="${user.age}"></td>
-            <td>
-                <a th:href="@{/users/edit(id=${user.id})}" class="btn btn-sm btn-warning">Edit</a>
-                <a th:href="@{/users/delete(id=${user.id})}"
-                   class="btn btn-sm btn-danger"
-                   onclick="return confirm('Delete this user?')">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <h1 class="mb-4">User list</h1>
+    <a th:href="@{/users/add}" class="btn btn-primary mb-3">Add user</a>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>First name</th>
+                <th>Last name</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName} ?: '-'"></td>
+                <td th:text="${user.age}"></td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a th:href="@{/users/edit(id=${user.id})}"
+                           class="btn btn-sm btn-warning me-1">Edit</a>
+                        <a th:href="@{/users/delete(id=${user.id})}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Вы уверены, что хотите удалить этого пользователя?')">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<script>
+    // Убедимся, что браузер использует UTF-8
+    document.charset = 'UTF-8';
+</script>
 </body>
 </html>

@@ -33,7 +33,8 @@ public class JpaConfig {
     @Bean
     public DataSource getDataSource() {
         String driver = env.getProperty("db.driver");
-        String url = env.getProperty("db.url");
+        String url = env.getProperty("db.url") +
+                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8";
         String username = env.getProperty("db.username");
         String pswrd = env.getProperty("db.password");
 
@@ -50,15 +51,6 @@ public class JpaConfig {
 
         return new HikariDataSource(config);
 
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName(env.getProperty("db.driver"));
-////        dataSource.setUrl(env.getProperty("db.url"));
-//        dataSource.setUsername(env.getProperty("db.username"));
-//        dataSource.setPassword(env.getProperty("db.password"));
-//        dataSource.setUrl(env.getProperty("db.url") +
-//                "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
-//
-//        return dataSource;
     }
 
     @Bean
@@ -72,6 +64,7 @@ public class JpaConfig {
         properties.put("hibernate.dialect", env.getProperty("db.dialect"));
         properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+
 //        properties.put("hibernate.connection.provider_class",
 //                env.getProperty("hibernate.connection.provider_class"));
         emf.setJpaProperties(properties);
